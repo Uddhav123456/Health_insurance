@@ -1,4 +1,4 @@
-from flask import Flask,request,jsonify
+from flask import Flask,request,jsonify,render_template
 import config
 from Project.utils import MedicalInsurance
 import numpy as np
@@ -6,26 +6,25 @@ import numpy as np
 
 app = Flask(__name__)
 @app.route("/")
-def get_home():
-    return "Hello Good Evening"
+def index():
+    return render_template('index.html')
 
 
-@app.route("/predict_charges",methods= ["POST","GET"])
+@app.route("/predict",methods= ["POST","GET"])
 def get_insurance():
-    if request.method == "POST":
-        data = request.form
-        print("user input data is >>>",data)
-        age = eval(data["age"])
-        gender = data["gender"]
-        bmi = eval(data["bmi"])
-        children = int(data["children"])
-        smoker  = data["smoker"]
-        region = data["region"]
-        med_obj = MedicalInsurance(age,gender,bmi,children,smoker,region)
-        charges = med_obj.get_predict_charges()
-        return jsonify({"Result":f"Predicted medical insurance charges is {charges[0]}"})
+    data = request.form
+    age = int(data["age"])
+    gender = data["gender"]
+    bmi = int(data["bmi"])
+    children = int(data["children"])
+    smoker  = data["smoker"]
+    region = data["region"]
+    med_obj = MedicalInsurance(age,gender,bmi,children,smoker,region)
+    charges = med_obj.get_predict_charges()
+    print(charges)
+
+    return render_template('index.html',health_insurance_price=charges)
     
-
-
+    
 if __name__ == "__main__":
-    app.run()
+    app.run(debug = True)
